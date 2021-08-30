@@ -14,6 +14,7 @@ if [ $# -eq 2 ]; then
 	fi
 else
 	echo "Number of Arguments invalid: should be equal to 2"
+	echo "argument 1 is path to directory on file system, argument 2 is text string to be searched within the directory"
 	exit 1
 fi
 

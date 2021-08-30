@@ -19,6 +19,7 @@ if [ $# -eq 2 ]; then
 	fi
 else
         echo "Number of Arguments invalid: should be equal to 2"
+	echo "argument 1 is full path to file, argument 2 is text string to be written"
         exit 1
 fi
 
