@@ -1,3 +1,12 @@
+/**
+* @file  writer.c
+* @brief This is a c program file which has functions to write a string to a specified file path passed as arguments.
+* 
+* @author Midhun Kumar Koneru
+* @date 2/9/2021
+*
+*/
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -12,7 +21,7 @@ int main(int argc , char *argv[])
 	if(argc < 3 && argc > 3)
 	{
 		printf("Input arguments not valid\n");
-		syslog(LOG_ERR, "Input arguments not valid");
+		syslog(LOG_ERR, "Input arguments not valid; First Argument : Full Path to the file, Second Argument : text string which will be written in the file");
 		printf("First Argument : Full Path to the file\n");
 		printf("Second Argument : text string which will be written in the file\n");
 		return 1;
@@ -22,15 +31,13 @@ int main(int argc , char *argv[])
 
 	if(fd == -1)
 	{
-		printf("return error\n");
-		syslog(LOG_ERR, "return error");
+		syslog(LOG_ERR, "return error: file specified as argument couldn't be opened(fd < 0)");
 		return 1;
 	}
 
 	ssize_t nr;
 
-	/* write the string in 'buf' to 'fd' */
-	//nr = write (fd, buf, strlen (buf));
+	// writing string to the path specified 
 	nr = write(fd, argv[2], strlen(argv[2]));
 	if (nr == -1)
 	{
@@ -39,7 +46,7 @@ int main(int argc , char *argv[])
 	}
 
 	printf("wrote string to file specified\n");
-	syslog(LOG_DEBUG, "wrote %s to %s ", argv[2], argv[1]);
+	syslog(LOG_DEBUG, "writing %s to %s ", argv[2], argv[1]);
 	closelog();
 	return 0;
 }
