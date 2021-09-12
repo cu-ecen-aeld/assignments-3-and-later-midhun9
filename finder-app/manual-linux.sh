@@ -124,21 +124,32 @@ sudo mknod -m 666 dev/null c 1 3
 sudo mknod -m 600 dev/console c 5 1
 
 # TODO: Clean and build the writer utility
-cd ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app
+#cd ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app
+cd ${FINDER_APP_DIR}
 make clean
 make CROSS_COMPILE=${CROSS_COMPILE}
 
 # TODO: Copy the finder related scripts and executables to the /home directory
 # on the target rootfs
 
-cp  ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/finder-test.sh ${OUTDIR}/rootfs/home
-cp  ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/finder.sh ${OUTDIR}/rootfs/home
-cp  ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/writer.sh ${OUTDIR}/rootfs/home
-cp  ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/writer.c ${OUTDIR}/rootfs/home
-cp  ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/writer ${OUTDIR}/rootfs/home
-cp  ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/Makefile ${OUTDIR}/rootfs/home
-cp -r ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/conf/ ${OUTDIR}/rootfs/home
-cp  ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/autorun-qemu.sh ${OUTDIR}/rootfs/home
+# used absolute path
+#cp  ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/finder-test.sh ${OUTDIR}/rootfs/home
+#cp  ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/finder.sh ${OUTDIR}/rootfs/home
+#cp  ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/writer.sh ${OUTDIR}/rootfs/home
+#cp  ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/writer.c ${OUTDIR}/rootfs/home
+#cp  ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/writer ${OUTDIR}/rootfs/home
+#cp  ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/Makefile ${OUTDIR}/rootfs/home
+#cp -r ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/conf/ ${OUTDIR}/rootfs/home
+#cp  ~/Desktop/aesd/assignments-3-and-later-midhun9/finder-app/autorun-qemu.sh ${OUTDIR}/rootfs/home
+
+cp  ./finder-test.sh ${OUTDIR}/rootfs/home
+cp  ./finder.sh ${OUTDIR}/rootfs/home
+cp  ./writer.sh ${OUTDIR}/rootfs/home
+cp  ./writer.c ${OUTDIR}/rootfs/home
+cp  ./writer ${OUTDIR}/rootfs/home
+cp  ./Makefile ${OUTDIR}/rootfs/home
+cp -r ./conf/ ${OUTDIR}/rootfs/home
+cp  ./autorun-qemu.sh ${OUTDIR}/rootfs/home
 
 
 # TODO: Chown the root directory
