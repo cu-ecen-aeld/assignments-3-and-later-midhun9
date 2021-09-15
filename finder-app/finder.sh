@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # finder script to find number of files and number of matching lines with the search string passed
 # Paramaeters : first argument  - path to a directory on a file system
 #		second argument - text string which will be searched within the files in the above directory 

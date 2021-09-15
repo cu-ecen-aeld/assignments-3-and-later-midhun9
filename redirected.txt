@@ -1,0 +1,9 @@
+home is $HOME
+Remove trailing newline
+Read home is /home/midhun from testfile.txt
+execv /bin/echo home is $HOME returned home is /home/midhun
+/home/midhun/Desktop/aesd/assignments-3-and-later-midhun9/assignment-autotest/test/assignment3/Test_systemcalls.c:95:test_exec_redirect_calls:FAIL: Expected 'home is $HOME' Was 'home is /home/midhun'. The variable $HOME should not be expanded using execv()
+
+-----------------------
+3 Tests 1 Failures 0 Ignored 
+FAIL
