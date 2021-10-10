@@ -1,12 +1,13 @@
 CC = $(CROSS_COMPILE)gcc
+CFLAGS = -g -Wall -Werror
+LDFLAGS = -pthread -lrt
 
 all: aesdsocket
 
 default: aesdsocket
 
 aesdsocket: aesdsocket.c
-	$(CC) -Wall -Werror -c -o aesdsocket.o aesdsocket.c
-	$(CC) -o aesdsocket aesdsocket.o
+	$(CC) $^ -o $@ $(INCLUDES) $(LDFLAGS) $(CFLAGS)
 
 clean:
 	rm -f aesdsocket *.o
