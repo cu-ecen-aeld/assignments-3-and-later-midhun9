@@ -47,9 +47,9 @@ typedef struct thread_data{
 	pthread_t thread_index;
 	int client_fd;
 	char *buffer;
-    char *transmit_buffer;
+    	char *transmit_buffer;
 	sigset_t signal_mask;
-
+	pthread_mutex_t *mutex;
     /**
      * Set to true if the thread completed with success, false
      * if an error occurred.
@@ -57,7 +57,7 @@ typedef struct thread_data{
     	bool thread_complete_success;
 }thread_data_t;
 
-pthread_mutex_t main_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t main_mutex;
 // SLIST.
 typedef struct slist_data_s slist_data_t;
 struct slist_data_s {
@@ -101,6 +101,13 @@ void close_all()
             		free(datap->thread_parameters.transmit_buffer);
        		}
         }
+
+	//destroy mutex
+	int rc  = pthread_mutex_destroy(&main_mutex);
+	if(rc != 0)
+	{
+		printf("failed in destroying mutex\n");
+	}
     
     	//free linked list
     	while(!SLIST_EMPTY(&head))
@@ -133,7 +140,7 @@ static void signal_handler (int signo)
         
 }
 
-void receive_send_data(void* thread_param)
+void* receive_send_data(void* thread_param)
 {
 	
 	thread_data_t *thread_func_args = (thread_data_t*)thread_param;
@@ -190,7 +197,7 @@ void receive_send_data(void* thread_param)
 	//total_bytes += received_bytes; //keep track of total bytes
 
 	int rc;
-	rc = pthread_mutex_lock(&main_mutex); //lock mutex
+	rc = pthread_mutex_lock(thread_func_args->mutex); //lock mutex
 	if(rc != 0)
 	{
 		perror("Mutex lock failed\n");
@@ -217,7 +224,7 @@ void receive_send_data(void* thread_param)
 		exit (EXIT_FAILURE);
 	}
 					
-	rc = pthread_mutex_unlock(&main_mutex); // unlock mutex
+	rc = pthread_mutex_unlock(thread_func_args->mutex); // unlock mutex
 	if(rc != 0)
 	{
 		perror("Mutex unlock failed\n");
@@ -244,7 +251,7 @@ void receive_send_data(void* thread_param)
 		exit (EXIT_FAILURE);
 	}
 				  
-	rc = pthread_mutex_lock(&main_mutex); //lock mutex
+	rc = pthread_mutex_lock(thread_func_args->mutex); //lock mutex
 	if(rc != 0)
 	{
 		perror("Mutex lock failed\n");
@@ -280,7 +287,7 @@ void receive_send_data(void* thread_param)
 		exit (EXIT_FAILURE);
 	}			
 					
-	rc = pthread_mutex_unlock(&main_mutex); // unlock mutex
+	rc = pthread_mutex_unlock(thread_func_args->mutex); // unlock mutex
 	if(rc != 0)
 	{
 		perror("Mutex unlock failed\n");
@@ -303,7 +310,7 @@ void receive_send_data(void* thread_param)
 	free(thread_func_args->buffer);
 	free(thread_func_args->transmit_buffer);
 	thread_func_args->thread_complete_success = true;
-
+	return NULL;	
 }
 
 //add timespecs and store in result
@@ -510,6 +517,15 @@ int main(int argc, char*argv[])
 		}
 	}
         
+	//initialize mutex
+	rc = pthread_mutex_init(&main_mutex,NULL);
+	if(rc != 0)
+	{
+		printf("error in initializing the mutex\n");
+		close_all();
+		exit(EXIT_FAILURE);
+	}
+
    	// can add timer with timer_handler but SIGALRM is not thread-safe (re-entrancy issues?)    
     	//signal(SIGALRM, timer_handler);
     	//struct itimerval timer;
@@ -612,8 +628,9 @@ int main(int argc, char*argv[])
 		datap->thread_parameters.client_fd = client_fd;
 		datap->thread_parameters.thread_complete_success = false;
 		datap->thread_parameters.signal_mask = signal_set;
-		
-		rc = pthread_create(&(datap->thread_parameters.thread_index), NULL, (void *)&receive_send_data, (void *) &(datap->thread_parameters)); // create pthread
+		datap->thread_parameters.mutex = &main_mutex;
+
+		rc = pthread_create(&(datap->thread_parameters.thread_index), NULL, (void *) &receive_send_data, (void *) &(datap->thread_parameters)); // create pthread
 		if(rc != 0)
 		{
 			printf("Error while creating pthread\n");
