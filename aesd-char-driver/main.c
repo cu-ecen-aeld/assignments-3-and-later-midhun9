@@ -111,7 +111,7 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
 	if(mutex_lock_interruptible(&chardev->lock))
 		return -ERESTARTSYS;
 
-	if(chardev->zerosize == false)
+	/*if(chardev->zerosize == false)
 	{
 		chardev->entry_local.buffptr = kzalloc(count, GFP_KERNEL); // enters only once at the start
 		chardev->zerosize = true;
@@ -119,8 +119,12 @@ ssize_t aesd_write(struct file *filp, const char __user *buf, size_t count,
 	else
 	{
 		chardev->entry_local.buffptr = krealloc(chardev->entry_local.buffptr, chardev->entry_local.size + count, GFP_KERNEL);
-	}
-
+	}*/
+	
+	if(chardev->entry_local.size == 0)
+                chardev->entry_local.buffptr = kzalloc(count, GFP_KERNEL);
+        else
+                chardev->entry_local.buffptr = krealloc(chardev->entry_local.buffptr, chardev->entry_local.size + count, GFP_KERNEL);
 
 	if(chardev->entry_local.buffptr == 0)
        	{
