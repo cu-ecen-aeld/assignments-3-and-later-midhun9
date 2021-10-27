@@ -35,7 +35,7 @@ struct aesd_dev
 	struct aesd_circular_buffer cb;
 	struct aesd_buffer_entry entry_local;
 	struct mutex lock;
-	bool zerosize; // flag is set true once entry_local.size is zero
+	//bool zerosize; // flag is set true once entry_local.size is zero
 };
 
 
