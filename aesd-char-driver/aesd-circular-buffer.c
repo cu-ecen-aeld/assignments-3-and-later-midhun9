@@ -123,7 +123,7 @@ void aesd_circular_buffer_clean(struct aesd_circular_buffer *buffer)
 			#ifdef __KERNEL__
 			kfree(buffer->entry[i].buffptr);
 			#else
-			free(buffer->entry[i].buffptr);
+			free((void*)buffer->entry[i].buffptr);
 			#endif
 		}
         }
