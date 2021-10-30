@@ -29,13 +29,19 @@
 struct aesd_buffer_entry *aesd_circular_buffer_find_entry_offset_for_fpos(struct aesd_circular_buffer *buffer,
 			size_t char_offset, size_t *entry_offset_byte_rtn )
 {
+
 	uint8_t out_offs = buffer->out_offs;
 	size_t size = 0;
 	size_t check_size = 0;
 	uint8_t temp_count = 0;
-	
+	uint8_t i = 0;
+
+	if ((out_offs == buffer->in_offs) && !(buffer->full)) 
+	{
+        	return NULL;
+    	}
 	// check each entry
-	for(uint8_t i = out_offs; temp_count < AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED; i = (i+1)%AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED)
+	for(i = out_offs; temp_count < AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED; i = (i+1)%AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED)
 	{
 		temp_count++;
 		size += buffer->entry[i].size;
@@ -49,20 +55,6 @@ struct aesd_buffer_entry *aesd_circular_buffer_find_entry_offset_for_fpos(struct
 
 	}
 
-	/*struct aesd_buffer_entry* entry;
-        uint8_t index = 0;
-	AESD_CIRCULAR_BUFFER_FOREACH(entry,buffer,index)
-       	{
-		size += entry->size;
-
-		if(size > char_offset)
-		{
-			check_size = size - entry->size;
-			*entry_offset_byte_rtn = char_offset - check_size;
-			return entry;
-		}
-	}*/
-
 
     return NULL;
 }
@@ -74,9 +66,14 @@ struct aesd_buffer_entry *aesd_circular_buffer_find_entry_offset_for_fpos(struct
 * Any necessary locking must be handled by the caller
 * Any memory referenced in @param add_entry must be allocated by and/or must have a lifetime managed by the caller.
 */
-void aesd_circular_buffer_add_entry(struct aesd_circular_buffer *buffer, const struct aesd_buffer_entry *add_entry)
+const char* aesd_circular_buffer_add_entry(struct aesd_circular_buffer *buffer, const struct aesd_buffer_entry *add_entry)
 {
-
+	const char* extra_byte = NULL;
+	
+	if(buffer->full)
+	{
+		extra_byte = buffer->entry[buffer->out_offs].buffptr; // add additional value to extra_byte if buffer is full
+	}
 
 	//add entry to buffer
 	buffer->entry[buffer->in_offs] = *add_entry;
@@ -94,7 +91,7 @@ void aesd_circular_buffer_add_entry(struct aesd_circular_buffer *buffer, const s
 		buffer->full = true;
 	}
 
-
+	return extra_byte;
 }
 
 /**
@@ -108,3 +105,27 @@ void aesd_circular_buffer_init(struct aesd_circular_buffer *buffer)
     buffer->out_offs = 0;            
     buffer->full = false;            
 }
+
+
+void aesd_circular_buffer_clean(struct aesd_circular_buffer *buffer)
+{
+	uint8_t out_offs = buffer->out_offs;
+	uint8_t temp_count = 0;
+        uint8_t i = 0;
+
+        // check each entry
+        for(i = out_offs; temp_count < AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED; i = (i+1)%AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED)
+        {
+                temp_count++;
+                
+		if(buffer->entry[i].buffptr != NULL)
+		{
+			#ifdef __KERNEL__
+			kfree(buffer->entry[i].buffptr);
+			#else
+			free((void*)buffer->entry[i].buffptr);
+			#endif
+		}
+        }
+}
+
